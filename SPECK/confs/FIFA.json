@@ -1,0 +1,18 @@
+{
+    "P": ["100"],
+    "procs": "4",
+    "reps": "20",
+    "T": ["10048"],
+    "strategies": [
+        "completePerm",
+        "itemsetsSwaps",
+        "sameSizePerm",
+        "sameSizeSwaps",
+        "sameFreqSwaps"
+    ],
+    "simulated": "false",
+    "datasetFilepath": "data/FIFA.txt",
+    "dataset": "FIFA",
+    "thetas": ["0.275"],
+    "outdir": "results/"
+}

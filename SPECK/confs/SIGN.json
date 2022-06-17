@@ -1,0 +1,18 @@
+{
+    "P": ["100"],
+    "procs": "32",
+    "reps": "1",
+    "T": ["10048"],
+    "strategies": [
+        "completePerm",
+        "itemsetsSwaps",
+        "sameSizePerm",
+        "sameSizeSwaps",
+        "sameFreqSwaps"
+    ],
+    "simulated": "false",
+    "datasetFilepath": "data/SIGN.txt",
+    "dataset": "SIGN",
+    "thetas": ["0.4"],
+    "outdir": "results/"
+}
