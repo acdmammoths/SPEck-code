@@ -1,6 +1,14 @@
 # SPEck: Mining Statistically-significant Sequential Patterns Efficiently with Exact Sampling
 
-This code is derived from the one for
+This repository contains the code for the paper *SPEck: Mining
+Statistically-significant Sequential Patterns Efficiently with Exact Sampling*
+([PDF](JenkinsEtAl-SPEck-DMKD22.pdf), by Steedman Jenkins, Stefan
+Walzer-Goldfeld, and [Matteo Riondato](https://matteo.rionda.to), appearing in
+the [*Data Mining and Knowledge
+Discovery*](https://www.springer.com/journal/10618) Special Issue for [ECML
+PKDD'22](https://2022.ecmlpkdd.org).
+
+The code is derived from the one for
 [ProMiSe](https://github.com/vandinlab/promise) by Andrea Tonon and Fabio
 Vandin. As such, it is distributed under the [GNU General Public License, Version
 3](LICENSE) or later.
