@@ -8,6 +8,10 @@ the [*Data Mining and Knowledge
 Discovery*](https://www.springer.com/journal/10618) Special Issue for [ECML
 PKDD'22](https://2022.ecmlpkdd.org).
 
+An [Amherst College Data* Mammoths](https://acdmammoths.github.io) project. This
+work was funded, in part by [NSF award
+IIS-2006765](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2006765).
+
 The code is derived from the one for
 [ProMiSe](https://github.com/vandinlab/promise) by Andrea Tonon and Fabio
 Vandin. As such, it is distributed under the [GNU General Public License, Version
