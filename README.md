@@ -2,7 +2,7 @@
 
 This repository contains the code for the paper *SPEck: Mining
 Statistically-significant Sequential Patterns Efficiently with Exact Sampling*
-([PDF](JenkinsEtAl-SPEck-DMKD22.pdf), by Steedman Jenkins, Stefan
+([PDF](JenkinsEtAl-SPEck-DMKD22.pdf)), by Steedman Jenkins, Stefan
 Walzer-Goldfeld, and [Matteo Riondato](https://matteo.rionda.to), appearing in
 the [*Data Mining and Knowledge
 Discovery*](https://www.springer.com/journal/10618) Special Issue for [ECML
