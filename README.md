@@ -2,12 +2,14 @@
 
 This code is derived from the one for
 [ProMiSe](https://github.com/vandinlab/promise) by Andrea Tonon and Fabio
-Vandin. As such, it is distributed under the GNU General Public License, Version
-3 or later.
+Vandin. As such, it is distributed under the [GNU General Public License, Version
+3](LICENSE) or later.
 
 ## Software requirements
 
-A recent Java SDK, [Maven](https://maven.apache.org/), [R](https://www.r-project.org/), [Python3](https://www.python.org/), and R packages `ggplot2` and `tidyverse`.
+A recent Java SDK, [Maven](https://maven.apache.org/),
+[R](https://www.r-project.org/), [Python3](https://www.python.org/), and R
+packages `ggplot2` and `tidyverse`.
 
 ## Building process
 
