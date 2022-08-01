@@ -325,7 +325,7 @@ public class SPEck implements Serializable {
         // loads the input dataset in the data structures provided in input
         loadDataset(fileIn,positionOrigin,datasetOrigin);
         // fixes the seed for the first random generator
-        Random r = new Random(0);
+        Random r = new Random();
         System.err.println("Generating t datasets...");
         generateTDatasets(T, theta, parallelization);
         double[] minPvalue = new double[P];
