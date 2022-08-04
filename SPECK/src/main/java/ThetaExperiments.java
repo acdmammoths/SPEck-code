@@ -33,6 +33,7 @@ public class ThetaExperiments {
         int P = 100;
         int T = 10000;
         int parallelization = 40;
+        double fwer = 0.05;
         File resultsFile = new File("./results/thetaExperiments.csv");
         FileWriter fw = new FileWriter(resultsFile);
         fw.write("strategy,dataset,iter,theta,time,sfsp,fsp\n");
@@ -47,7 +48,7 @@ public class ThetaExperiments {
                     PropertyConfigurator.configure("log4j.properties");
                     SPEck speck = new SPEck(fileIn, fileOut, scc, strategy);
                     long start = System.currentTimeMillis();
-                    speck.execute(P, T, parallelization, theta);
+                    speck.execute(P, T, parallelization, theta, fwer);
                     scc.stop();
                     long timeElapsed = System.currentTimeMillis() - start;
                     int sfsp = speck.numSfsp;

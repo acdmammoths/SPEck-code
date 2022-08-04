@@ -14,5 +14,6 @@
     "datasetFilepath": "data/FIFA.txt",
     "dataset": "FIFA",
     "thetas": ["0.275"],
+    "fwer" : "0.05",
     "outdir": "results/"
 }

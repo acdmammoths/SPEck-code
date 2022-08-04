@@ -14,5 +14,6 @@
     "datasetFilepath": "data/BIBLE.txt",
     "dataset": "BIBLE",
     "thetas": ["0.1"],
+    "fwer" : "0.05",
     "outdir": "results/"
 }

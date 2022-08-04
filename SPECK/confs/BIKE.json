@@ -14,5 +14,6 @@
     "datasetFilepath": "data/BIKE.txt",
     "dataset": "BIKE",
     "thetas": ["0.025"],
+    "fwer" : "0.05",
     "outdir": "results/"
 }

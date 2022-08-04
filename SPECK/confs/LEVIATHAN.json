@@ -14,5 +14,6 @@
     "datasetFilepath": "data/LEVIATHAN.txt",
     "dataset": "LEVIATHAN",
     "thetas": ["0.15"],
+    "fwer" : "0.05",
     "outdir": "results/"
 }

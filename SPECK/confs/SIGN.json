@@ -14,5 +14,6 @@
     "datasetFilepath": "data/SIGN.txt",
     "dataset": "SIGN",
     "thetas": ["0.4"],
+    "fwer" : "0.05",
     "outdir": "results/"
 }

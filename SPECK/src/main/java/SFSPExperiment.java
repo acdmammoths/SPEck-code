@@ -18,6 +18,7 @@ public class SFSPExperiment {
         JSONArray P = (JSONArray) json.get("P");
         JSONArray T = (JSONArray) json.get("T");
         JSONArray thetas = (JSONArray) json.get("thetas");
+        String fwer = json.getString("fwer");
         JSONArray strategies = (JSONArray) json.get("strategies");
         String reps = json.getString("reps");
         String procs = json.getString("procs");
@@ -36,7 +37,7 @@ public class SFSPExperiment {
                         String theta = (String) o4;
                         System.out.println("      " + theta);
                             String file = outdir +"sfsp/"+dataset+"_"+strategy+"_"+p+"_"+t+"_"+theta+"_";//+rep;
-                            String[] expArgs = {dataset, p, t, theta, procs, strategy, "t"};
+                            String[] expArgs = {dataset, p, t, theta, fwer, procs, strategy, "t"};
 
                             PrintStream fileOut = new PrintStream(file + ".json");
                             System.setOut(fileOut);

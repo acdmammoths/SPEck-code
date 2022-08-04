@@ -310,15 +310,16 @@ public class SPEck implements Serializable {
 
     /**
      * Executes SPEck algorithm. It reads the starting dataset from file and after the computation
-     * it stored the SFSF found in teh output file.
+     * it stored the SFSF found in the output file.
      * @param   P               the number of random datasets used for the WY method
      * @param   T               the number of random datasets for the Monte Carlo estimate of p-values
      * @param   parallelization the number of cores of the machine. It is the number of random datasets
      *                          generated at the same time in the Monte Carlo estimation. Each core of
      *                          the machine computes the p-values on T/parallelization random datasets.
      * @param theta             the minimum frequency threshold used to mine the dataset
+     * @param fwer              the maximum family-wise error rate (FWER) threshold used to mine the dataset
      */
-    void execute(int P, int T, int parallelization, double theta) throws IOException, ClassNotFoundException, InterruptedException {
+    void execute(int P, int T, int parallelization, double theta, double fwer) throws IOException, ClassNotFoundException, InterruptedException {
         String file = fileIn.split("\\.")[0];
         String fileRandom = file + "_random.txt";
         String fileMinned = file + "_mined.txt";
@@ -350,7 +351,7 @@ public class SPEck implements Serializable {
         // sorts the P minimum p-values
         Arrays.sort(minPvalue);
         // computes the corrected threshold
-        correctedThreshold = minPvalue[(int)(P*0.05)];
+        correctedThreshold = minPvalue[(int)(P*fwer)];
         // if the corrected threshold is greater than the minimum possible value
         if(correctedThreshold!=1/(T * 1. + 1)){
             System.err.println("Calculating final p-values...");
@@ -414,24 +415,26 @@ public class SPEck implements Serializable {
      * 1:   the number of random datasets used for the WY method
      * 2:   the number of random datasets for the Monte Carlo estimate of p-values
      * 3:   the minimum frequency threshold
-     * 4:   the number of cores of the machine
-     * 5:   the strategy used by SPEck to generate random datasets (in camelCase)--
+     * 4:   the maximum FWER threshold
+     * 5:   the number of cores of the machine
+     * 6:   the strategy used by SPEck to generate random datasets (in camelCase)--
      *            itemsetsSwaps,
      *            completePerm,
      *            sameSizePerm,
      *            sameSizeSwaps,
      *            sameFreqSwaps,
      *            sameSizeSeqSwaps
-     * 6:   "t" to print json file, otherwise "f"
+     * 7:   "t" to print json file, otherwise "f"
      */
     public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         String dataset = args[0];
         int P = Integer.parseInt(args[1]);
         int T = Integer.parseInt(args[2]);
         double theta = Double.parseDouble(args[3]);
-        int parallelization = Integer.parseInt(args[4]);
-        String strategy = args[5];
-        boolean createJson = args[6].equals("t");
+        double fwer = Double.parseDouble(args[4]);
+        int parallelization = Integer.parseInt(args[5]);
+        String strategy = args[6];
+        boolean createJson = args[7].equals("t");
         String fileIn = "data/"+dataset+".txt";
         String fileOut = "data/"+dataset+"_SFSP.txt";
         long start = System.currentTimeMillis();
@@ -439,7 +442,7 @@ public class SPEck implements Serializable {
         JavaSparkContext scc = new JavaSparkContext(sparkConf);
         PropertyConfigurator.configure("log4j.properties");
         SPEck speck = new SPEck(fileIn,fileOut,scc, strategy);
-        speck.execute(P,T,parallelization,theta);
+        speck.execute(P,T,parallelization,theta,fwer);
         scc.stop();
         Long timeElapsed = System.currentTimeMillis()-start;
 
@@ -453,6 +456,7 @@ public class SPEck implements Serializable {
         confs.put("T", T);
         confs.put("strategy", strategy);
         confs.put("theta", theta);
+        confs.put("fwer", fwer);
         confs.put("procs", parallelization);
         confs.put("dataset", dataset);
         confs.put("numItemsets", numItemsets);
