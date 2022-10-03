@@ -25,28 +25,43 @@ import java.util.stream.IntStream;
  */
 
 public class SPEck implements Serializable {
+
+    /**
+     * Initializer
+     * @param   scc    <JavaSparkContext> spark context for parallel execution
+     * @param   fileIn  <String> storing the file name of the input dataset to mine the SFSP
+     * @param   fileOut <String> storing the file name of the output (SFSP)
+     * @param   strategy <String> storing the method of sampling the random dataset
+     * @param   datasetFilePaths <String[]> storing the file paths of the dataset files
+     * @param   numSfsp <Integer> storing the number of statistically significant sequential patterns
+     * @param   numFsp  <Integer> storing the number of frequent sequential patterns
+     * @param   correctedThreshold <Double> storing the correctedThreshold
+     * @param   positionOrigin <Int2ObjectOpenHashMap<Utils.Pair>> storing numbered positions originally
+     * @param   datasetOrigin <Utils.Dataset> storing the original dataset
+     * @param   datasetRandom <Utils.Dataset> storing the randomized dataset
+     * @param   sfsp    <ObjectArrayList<Utils.PairT<String, Double>>> storing statistically significant sequential patterns
+     * @param   fspSup  <Object2IntOpenHashMap<String>> storing mapping of frequent sequential patters to their supports
+     */
     transient JavaSparkContext scc;
-    // input and output files
     String fileIn;
     String fileOut;
-    // data structures to store the datasets data
-    Int2ObjectOpenHashMap<Utils.Pair> positionOrigin;
-    Utils.Dataset datasetOrigin;
-    Object2IntOpenHashMap<String> itemsetsOrigin;
-    Utils.Dataset datasetRandom;
     String strategy;
     String[] datasetFilePaths;
     int numSfsp;
     int numFsp;
     double correctedThreshold;
+    Int2ObjectOpenHashMap<Utils.Pair> positionOrigin;
+    Utils.Dataset datasetOrigin;
+    Utils.Dataset datasetRandom;
     ObjectArrayList<Utils.PairT<String, Double>> sfsp = new ObjectArrayList<>();
     Object2IntOpenHashMap<String> fspSup = new Object2IntOpenHashMap<>();
 
     /**
      * Constructor
-     * @param   fileIn  file of the input dataset to mine the SFSP
-     * @param   fileOut file to store the SFSP
-     * @param   scc     JavaSparkContext for the parallel execution
+     * @param   fileIn  <String> storing the file name of the input dataset to mine the SFSP
+     * @param   fileOut <String> storing the file name of the output (SFSP)
+     * @param   scc    <JavaSparkContext> spark context for parallel execution
+     * @param   strategy <String> storing the method of sampling the random dataset  
      */
     SPEck(String fileIn, String fileOut, JavaSparkContext scc, String strategy){
         this.fileIn = fileIn;
@@ -55,7 +70,6 @@ public class SPEck implements Serializable {
         this.strategy = strategy;
         positionOrigin = new Int2ObjectOpenHashMap<>();
         datasetOrigin = new Utils.Dataset();
-        itemsetsOrigin = new Object2IntOpenHashMap<>();
     }
 
     /**
