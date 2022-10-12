@@ -51,8 +51,8 @@ public class ThetaExperiments {
                     speck.execute(P, T, parallelization, theta, fwer);
                     scc.stop();
                     long timeElapsed = System.currentTimeMillis() - start;
-                    int sfsp = speck.numSfsp;
-                    int fsp = speck.numFsp;
+                    int sfsp = speck.numSFSP;
+                    int fsp = speck.numFSP;
                     fw.write(strategy +","+dataset+","+i+","+theta+","+timeElapsed+","+sfsp+","+fsp+"\n");
                     fw.flush();
                }
