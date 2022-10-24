@@ -74,6 +74,79 @@ public class SPEck implements Serializable {
     }
 
     /**
+     * Mines the dataset in the obsDatasetPath file using theta as minimum
+     * frequency threshold and stores in outSfspPath the FSP found.
+     * This method uses the PrefixSpan implementation provided in the SPMF library.
+     * @param   obsDatasetPath   the name of the file that contains the dataset to mine
+     * @param   fileFSP  the name of the file where the method stores the sequential patterns found
+     * @param   theta    the minimum frequency threshold used to mine the dataset
+     */
+    protected static void mining(String obsDatasetPath, 
+                                 String fileFSP,
+                                 double theta
+    ) throws IOException{
+        AlgoPrefixSpan alg = new AlgoPrefixSpan();
+        alg.runAlgorithm(obsDatasetPath, theta, fileFSP);
+    }
+
+    /**
+     * Reads the dataset from obsDatasetPath file and stores the dataset in the data structures provided in input.
+     * @param   obsDatasetPath  the name of the file that contains the dataset to load
+     * @param   positions       an hashmap where it assigns an index to each position of the dataset
+     * @param   dataset         an arraylist where it stores the index of the itemsets in the transactions of the dataset.
+     *                          Each element of the arraylist represents a transactions and it is an arraylist of
+     *                          integers. The integers in such arraylist are the indexes of the itemsets in that transaction.
+     */
+    protected static void loadDataset(String obsDatasetPath,
+                                      Int2ObjectOpenHashMap<Utils.Pair> positions,
+                                      Utils.Dataset dataset
+    ) throws IOException {
+        // initialize the itemsets object
+        Object2IntOpenHashMap<String> itemsets = new Object2IntOpenHashMap<>();
+
+        // initialize the file reader and the buffered reader
+        FileReader fr = new FileReader(obsDatasetPath);
+        BufferedReader br = new BufferedReader(fr);
+
+        // read the first line and intialize the temporary variables
+        String line = br.readLine();
+        int i = 0;
+        int itemset = 0;
+        int position = 0;
+
+        // iterate over all the lines while line is not null
+        while(line!=null){
+            // initialize the temporary variable transaction
+            ObjectArrayList<Utils.Itemset> transaction = new ObjectArrayList<>();
+
+            // splitting the line readed in
+            String[] splitted = line.split(" -1 ");
+
+            // for every element in the splitted array
+            for(int j=0;j<splitted.length-1;j++){
+                Utils.Itemset is;
+                if(!itemsets.containsKey(splitted[j])){
+                    is = new Utils.Itemset(splitted[j], itemset, i);
+                    itemsets.put(splitted[j],itemset);
+                    itemset++;
+                }
+                else {
+                    is = new Utils.Itemset(splitted[j], itemsets.getInt(splitted[j]), i);
+                }
+                positions.put(position++,new Utils.Pair(i,j));
+                transaction.add(is);
+            }
+
+            // add the current transaction to the dataset and move on to the next line
+            dataset.add(transaction);
+            line = br.readLine();
+            i++;
+        }
+        br.close();
+        fr.close();
+    }
+
+    /**
      * Computes the p-values in parallel with a Monte Carlo procedure. It returns the p-values computed
      * by this core.
      * @param   index           the index of the core used
@@ -94,72 +167,39 @@ public class SPEck implements Serializable {
         // reads the FSP mined from the actual dataset and stores them in the data structures
         int numSP = readOut(fileMined,spSupp,spIndex);
         int[] pValue = new int[numSP];
-        // generates T/numCores random datasets with this core
+        // generates T/numCores random datasets with this core and executes updatePvalues for every core
         int start = T * (index - 1) / numCores;
-        int end = T*index / numCores;
-        for(int j=start;j<end;j++){
-           String fileMinned = fp[j];
+        int end = T * index / numCores;
+        
+        for(int j = start; j < end; j++){
+            String file = fp[j];
             // updates the p-values with the FSP of the random dataset generated
-            updatePValue(fileMinned,spSupp,pValue,spIndex);
+            // try to read the file and throw exception if unable to do so
+            try {
+                FileReader fr = new FileReader(file);
+                BufferedReader br = new BufferedReader(fr);
+                String line = br.readLine();
+                while(line!=null){
+                    String[] splitted = line.split(" #SUP: ");
+                    if(spSupp.containsKey(splitted[0])){
+                        int suppO = spSupp.getInt(splitted[0]);
+                        int suppS = Integer.parseInt(splitted[1]);
+                        if(suppO <= suppS) {
+                            pValue[spIndex.getInt(splitted[0])]++;
+                        }
+                    }
+                    line = br.readLine();
+                }
+                br.close();
+                fr.close();
+            } catch (Exception e) {
+                System.err.println("updatePValue: cannot open/read " + fileMined + ": " + e.getMessage());
+                System.exit(1);
+            }
+            
+            //updatePValue(file,spSupp,pValue,spIndex);
         }
         return pValue;
-    }
-
-    /**
-     * Reads the dataset from obsDatasetPath file and stores the dataset in the data structures provided in input.
-     * @param   obsDatasetPath  the name of the file that contains the dataset to load
-     * @param   positions       an hashmap where it assigns an index to each position of the dataset
-     * @param   dataset         an arraylist where it stores the index of the itemsets in the transactions of the dataset.
-     *                          Each element of the arraylist represents a transactions and it is an arraylist of
-     *                          integers. The integers in such arraylist are the indexes of the itemsets in that transaction.
-     */
-    protected static void loadDataset(String obsDatasetPath,
-                                      Int2ObjectOpenHashMap<Utils.Pair> positions,
-                                      Utils.Dataset dataset
-    ) throws IOException {
-        Object2IntOpenHashMap<String> itemsets = new Object2IntOpenHashMap<>();
-        FileReader fr = new FileReader(obsDatasetPath);
-        BufferedReader br = new BufferedReader(fr);
-        String line = br.readLine();
-        int i = 0;
-        int itemset = 0;
-        int position = 0;
-        while(line!=null){
-            ObjectArrayList<Utils.Itemset> transaction = new ObjectArrayList<>();
-            String[] splitted = line.split(" -1 ");
-            for(int j=0;j<splitted.length-1;j++){
-                Utils.Itemset is;
-                if(!itemsets.containsKey(splitted[j])){
-                    is = new Utils.Itemset(splitted[j], itemset, i);
-                    itemsets.put(splitted[j],itemset);
-                    itemset++;
-                }
-                else is = new Utils.Itemset(splitted[j], itemsets.getInt(splitted[j]), i);
-                positions.put(position++,new Utils.Pair(i,j));
-                transaction.add(is);
-            }
-            dataset.add(transaction);
-            line = br.readLine();
-            i++;
-        }
-        br.close();
-        fr.close();
-    }
-
-    /**
-     * Mines the dataset in the obsDatasetPath file using theta as minimum
-     * frequency threshold and stores in outSfspPath the FSP found.
-     * This method uses the PrefixSpan implementation provided in the SPMF library.
-     * @param   obsDatasetPath   the name of the file that contains the dataset to mine
-     * @param   fileFSP  the name of the file where the method stores the sequential patterns found
-     * @param   theta    the minimum frequency threshold used to mine the dataset
-     */
-    protected static void mining(String obsDatasetPath, 
-                                 String fileFSP,
-                                 double theta
-    ) throws IOException{
-        AlgoPrefixSpan alg = new AlgoPrefixSpan();
-        alg.runAlgorithm(obsDatasetPath,theta,fileFSP);
     }
 
     /**
@@ -194,6 +234,7 @@ public class SPEck implements Serializable {
         return spIndex.size();
     }
 
+    
     /**
      * Updates the data for the p-values computation after the mining of a new random dataset.
      * @param   file    the name of the file with the FSP mined from the random dataset
@@ -201,17 +242,16 @@ public class SPEck implements Serializable {
      * @param   pValue  the array containing the data for the p-values computation
      * @param   spIndex the hashmap that contains the indexes of the FSP mined from the starting dataset
      */
+    /*
     private static void updatePValue(String file, 
                                      Object2IntOpenHashMap<String> spSupp, 
                                      int[] pValue, 
                                      Object2IntOpenHashMap<String> spIndex)
     {
-        
+        // try to read the file and throw exception if unable to do so
         try {
             FileReader fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
-        
-
             String line = br.readLine();
             while(line!=null){
                 String[] splitted = line.split(" #SUP: ");
@@ -229,7 +269,7 @@ public class SPEck implements Serializable {
             System.exit(1);
         }
     }
-
+    */
     /**
      * Writes a random dataset in the outSfspPath file.
      * @param   outSfspPath         the name of the file where it writes the dataset
@@ -238,6 +278,7 @@ public class SPEck implements Serializable {
     protected static void writeDataset(String outSfspPath, 
                                        Utils.Dataset dataset
     ) throws IOException {
+
         FileWriter fw = new FileWriter(outSfspPath);
         BufferedWriter bw = new BufferedWriter(fw);
         for (ObjectArrayList<Utils.Itemset> transaction : dataset) {
@@ -291,8 +332,9 @@ public class SPEck implements Serializable {
         IntArrayList indexes = new IntArrayList();
         for (int i = 0; i < numCores; i++) indexes.add(i+1);
 
-        List<String[]> results = scc.parallelize(indexes, numCores).map(o1 -> parallelGenDataset(o1, t, theta,
-                strategy, numCores, obsDatasetPath)).collect();
+        List<String[]> results = scc.parallelize(indexes, numCores)
+                                    .map(o1 -> parallelGenTDatasets(o1, t, theta,strategy, numCores, obsDatasetPath))
+                                    .collect();
 
         int cur = 0;
         for (String[] arr : results){
@@ -314,7 +356,7 @@ public class SPEck implements Serializable {
      *                          the machine computes the p-values on T/numCores random datasets.
      * @return                  returns an array of file paths where the mined datasets are located
      */
-    public static String[] parallelGenDataset(int i, 
+    public static String[] parallelGenTDatasets(int i, 
                                               int T, 
                                               double theta, 
                                               String strategy, 
@@ -327,7 +369,6 @@ public class SPEck implements Serializable {
         Utils.Dataset datasetOrigin = new Utils.Dataset();
         Int2ObjectOpenHashMap<Utils.Pair> positionOrigin = new Int2ObjectOpenHashMap<>();
         loadDataset(obsDatasetPath, positionOrigin, datasetOrigin);
-
 
         int start = T * (i - 1) / numCores;
         int end = T * i / numCores;
@@ -376,6 +417,7 @@ public class SPEck implements Serializable {
         Random r = new Random();
         System.err.println("Generating t datasets...");
         generateTDatasets(T, theta, numCores);
+
         double[] minPvalue = new double[P];
         // for all the P datasets of the WY method
         System.err.println("Calculating p values for corrected threshold in spark...");
@@ -394,41 +436,51 @@ public class SPEck implements Serializable {
             }
             minPvalue[j] = (1 + min) / (T * 1. + 1);
         }
+
         System.err.println("Combining spark results...");
         // sorts the P minimum p-values
         Arrays.sort(minPvalue);
         // computes the corrected threshold
         correctedThreshold = minPvalue[(int)(P*fwer)];
         // if the corrected threshold is greater than the minimum possible value
+
         if(correctedThreshold!=1/(T * 1. + 1)){
             System.err.println("Calculating final p-values...");
             // mines the starting dataset
             mining(obsDatasetPath, fileMinned, theta);
             file = obsDatasetPath;
+            
             // computes the p-values of the starting dataset in parallel
             int[] pValueInt = computePValues(T,numCores,fileMinned);
+
             // reads and stores the FSP mined from the starting dataset
             FileReader fr = new FileReader(fileMinned);
             BufferedReader br = new BufferedReader(fr);
-            String line = br.readLine();
             ObjectArrayList<String> fsp = new ObjectArrayList<>();
+
+            String line = br.readLine();
             while (line != null) {
                 String[] splitted = line.split(" #SUP: ");
                 fsp.add(splitted[0]);
                 fspSup.put(splitted[0], Integer.parseInt(splitted[1]));
                 line = br.readLine();
             }
+
             br.close();
             fr.close();
+
             this.numFSP = fsp.size();
             for (int k = 0; k < pValueInt.length; k++) {
                 sfsp.add(new Utils.PairT<String, Double>(fsp.get(k), (1 + pValueInt[k]) / (T * 1. + 1)));
             }
+
             // sort the sfsp
             sfsp.sort(Comparator.comparing(o -> o.y));
+
             // writes the sfsp in the output file with their support and p-value
             FileWriter fw = new FileWriter(outSfspPath);
             BufferedWriter bw = new BufferedWriter(fw);
+
             int numSFSP = 0;
             for (Utils.PairT<String, Double> currPair : sfsp) {
                 // if the p-value is lower than the corrected threshold
@@ -444,15 +496,18 @@ public class SPEck implements Serializable {
             this.numSFSP = 0;
             this.numFSP = -1;
         }
+
         // deletes the files generated
         File fileR = new File(fileRandom);
         fileR.delete();
         File fileM = new File(fileMinned);
         fileM.delete();
 
-        for (String fp : datasetTPaths) new File(fp).delete();
+        for (String fp : datasetTPaths) {
+            new File(fp).delete();
+    
+        }
     }
-
     /**
      * Main Method of SPEck:
      * Command Line Input Arguments:
@@ -497,18 +552,16 @@ public class SPEck implements Serializable {
         String obsDatasetPath = "data/" + dataset + ".txt";
         String outSfspPath = "data/" + dataset + "_SFSP.txt";
 
-        
-
         // effectively start the timer by storing the current time (= start time).
         long start = System.currentTimeMillis();
 
         // declaring and configuring the JavaSparkContext using Spark and PropertyConfigurator
         SparkConf sparkConfiguration = new SparkConf().setMaster("local[*]")
-                                             .setAppName("SPEck")
-                                             .set("spark.executor.memory","5g")
-                                             .set("spark.driver.memory","5g")
-                                             .set("spark.executor.heartbeatInterval","10000000")
-                                             .set("spark.network.timeout", "10000000");
+                                                      .setAppName("SPEck")
+                                                      .set("spark.executor.memory","5g")
+                                                      .set("spark.driver.memory","5g")
+                                                      .set("spark.executor.heartbeatInterval","10000000")
+                                                      .set("spark.network.timeout", "10000000");
         JavaSparkContext scc = new JavaSparkContext(sparkConfiguration);
         PropertyConfigurator.configure("log4j.properties");
 
@@ -522,17 +575,16 @@ public class SPEck implements Serializable {
         // effectively stop the timer by storing the current time (= stop time).
         long stop = System.currentTimeMillis();
         
+        // calculating elapsed time
         long timeElapsed = stop - start;
 
         // exit if the output is not needed in form of JSON
         if (!createJson) System.exit(0);
 
-
+        // building confs JSON object to store configuration information
+        JSONObject confs = new JSONObject();
         int numItemsets = Utils.getNumItemsets(speck.datasetOrigin);
         int numTransactions = speck.datasetOrigin.size();
-        JSONObject output = new JSONObject();
-        JSONObject confs = new JSONObject();
-        JSONObject results = new JSONObject();
         confs.put("P", P);
         confs.put("T", T);
         confs.put("strategy", strategy);
@@ -542,16 +594,12 @@ public class SPEck implements Serializable {
         confs.put("dataset", dataset);
         confs.put("numItemsets", numItemsets);
         confs.put("numTransactions", numTransactions);
-        results.put("runtime", timeElapsed); //More detailed runtimes
-        results.put("numSFSP", speck.numSFSP);
-        results.put("numFSP", speck.numFSP);
-        results.put("correctedThreshold", speck.correctedThreshold);
 
-        //Make list of sfsp
+        // building sfsp JSON object to store pattern information
         JSONObject sfsp = new JSONObject();
         for (Utils.PairT<String, Double> currPair : speck.sfsp) {
-            // if the p-value is lower than the corrected threshold
-            if(currPair.y<speck.correctedThreshold){
+            // if the p-value is lower than the corrected threshold, then store the pattern
+            if(currPair.y < speck.correctedThreshold){
                 JSONObject patternInfo = new JSONObject();
                 patternInfo.put("sup", speck.fspSup.getInt(currPair.x));
                 patternInfo.put("pValue", currPair.y);
@@ -559,10 +607,20 @@ public class SPEck implements Serializable {
             }
         }
 
+        // building results JSON object to store results of the experiments
+        JSONObject results = new JSONObject();
+        results.put("runtime", timeElapsed); //More detailed runtimes
+        results.put("numSFSP", speck.numSFSP);
+        results.put("numFSP", speck.numFSP);
+        results.put("correctedThreshold", speck.correctedThreshold);
         results.put("sfsp", sfsp);
+
+        // building output JSON object to store the output to be returned
+        JSONObject output = new JSONObject();
         output.put("confs", confs);
         output.put("results", results);
 
+        // indent and print out the output JSON object
         System.out.println(output.toString(4));
     }
 }

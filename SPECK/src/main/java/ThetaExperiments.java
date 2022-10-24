@@ -25,8 +25,11 @@ public class ThetaExperiments {
             System.out.println(theta + " " + numLines);
         }
     }
-
+    /*
+     * Main Method
+     */
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+        // initializing the parameters and possible strategies
         String[] strategies = new String[]{"completePerm", "sameSizePerm"};
         String dataset = "BIBLE";
         String fileIn = "./data/BIBLE.txt";
@@ -34,6 +37,8 @@ public class ThetaExperiments {
         int T = 10000;
         int parallelization = 40;
         double fwer = 0.05;
+
+        
         File resultsFile = new File("./results/thetaExperiments.csv");
         FileWriter fw = new FileWriter(resultsFile);
         fw.write("strategy,dataset,iter,theta,time,sfsp,fsp\n");
