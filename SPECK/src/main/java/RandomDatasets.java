@@ -1,3 +1,7 @@
+<<<<<<< Updated upstream
+=======
+// import appropriate standard java packages
+>>>>>>> Stashed changes
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -246,10 +250,14 @@ public class RandomDatasets {
                     probs[j] = 0;
                 }
             }
+            
+            // standardizing the probabilities to be in the range of 0 to 1
             double sum = DoubleStream.of(probs).sum();
             for (int j = 1; j < probs.length; j++) {
                 probs[j] /= sum;
             }
+            
+            // get two random sequences a and b
             int k = Utils.randomWeightedChoice(probs);
             int a = r.nextInt(cardList.get(k).size());
             int b = r.nextInt(cardList.get(k).size());
@@ -257,17 +265,34 @@ public class RandomDatasets {
             Utils.Sequence sA = cardList.get(k).get(a);
             Utils.Sequence sB = cardList.get(k).get(b);
 
+            // remove the corresponding sequences from cardinality list
             Utils.removeCardLists(sA, sB, cardList, datasetRandom);
 
+            // swap the corresponding sequences at hand
             Utils.swapSeq(sA, sB, datasetRandom);
 
+            // update the cardinality lists with the swapped sequences
             Utils.updateCardLists(sA, sB, cardList, datasetRandom);
         }
+<<<<<<< Updated upstream
         //shuffle all transactions
         for (ObjectArrayList<Utils.Itemset> trans : datasetRandom) {
             Collections.shuffle(trans);
         }
         return System.nanoTime() - start;
+=======
+        
+        // shuffle each transaction in datasetRandom
+        for (ObjectArrayList<Utils.Itemset> trans : datasetRandom) {
+            Collections.shuffle(trans);
+        }
+
+        // stopping the timer
+        long end = System.nanoTime();
+
+        // return the time required to do the process
+        return end - start;
+>>>>>>> Stashed changes
     }
 }
 

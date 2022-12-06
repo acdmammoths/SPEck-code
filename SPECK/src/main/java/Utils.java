@@ -1,3 +1,4 @@
+// import appropriate standard java packages
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -7,6 +8,10 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.*;
 import java.util.*;
 
+/**
+ * This class includes several methods for defining {@link Dataset} and other 
+ * helper methods which are to be used in the SPEck algorithm (SPEck.java and RandomDatasets.java).
+ */
 public class Utils {
     /**
      * It returns the number of itemsets in the dataset

@@ -34,6 +34,10 @@ public class ThetaExperiments {
         int T = 10000;
         int parallelization = 40;
         double fwer = 0.05;
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         File resultsFile = new File("./results/thetaExperiments.csv");
         FileWriter fw = new FileWriter(resultsFile);
         fw.write("strategy,dataset,iter,theta,time,sfsp,fsp\n");
