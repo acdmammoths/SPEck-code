@@ -1,3 +1,4 @@
+// import appropriate standard java packages
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -7,6 +8,10 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.*;
 import java.util.*;
 
+/**
+ * This class includes several methods for defining {@link Dataset} and other
+ * helper methods which are to be used in the SPEck algorithm (SPEck.java and RandomDatasets.java).
+ */
 public class Utils {
     /**
      * It returns the number of itemsets in the dataset
@@ -47,7 +52,7 @@ public class Utils {
 
     /**
      * It returns the number of itemsets in the dataset
-     * @param   dataset         the hashmap that contains object array lists (transactions) 
+     * @param   dataset         the hashmap that contains object array lists (transactions)
      *                          of itemsets(See SPEck.loadDataset method).
      * @return  numItemsets     the number of itemsets in the dataset
      */
@@ -59,7 +64,7 @@ public class Utils {
 
     /**
      * It returns the lengths of all transactions in the dataset
-     * @param   dataset         the hashmap that contains object array lists (transactions) 
+     * @param   dataset         the hashmap that contains object array lists (transactions)
      *                          of itemsets(See SPEck.loadDataset method).
      * @return  translengths    an array where each index i contains the length of the ith transaction in the dataset
      */
@@ -71,7 +76,7 @@ public class Utils {
 
     /**
      * It returns an array of the itemlengths of every transaction
-     * @param   dataset         the hashmap that contains object array lists (transactions) 
+     * @param   dataset         the hashmap that contains object array lists (transactions)
      *                          of itemsets(See SPEck.loadDataset method).
      * @return  itemLengths     an array of itemlengths
      */
@@ -569,11 +574,10 @@ public class Utils {
             this.y=y;
         }
     }
-    
+
     public static class Dataset extends ObjectArrayList<ObjectArrayList<Itemset>> {
         public Dataset() {
 
         }
     }
 }
-

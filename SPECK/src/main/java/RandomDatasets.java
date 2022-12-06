@@ -1,4 +1,4 @@
-// import appropriate proprietary packages
+// import appropriate third-party packages
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -68,7 +68,7 @@ public class RandomDatasets {
 
     public static long completePerm(
             Utils.Dataset datasetRandom,
-            Utils.Dataset datasetOrigin) 
+            Utils.Dataset datasetOrigin)
     {
         // start the timer
         long start = System.nanoTime();
@@ -123,13 +123,13 @@ public class RandomDatasets {
             }
         }
 
-        // ionitializing the newDatasetList
+        // initializing the newDatasetList
         ObjectArrayList<Utils.Itemset> newDatasetList = new ObjectArrayList<>();
         for (int i = 0; i < m; i++) {
             newDatasetList.add(null);
         }
 
-        // initializa a cardinality list
+        // initialize a cardinality list
         Int2ObjectOpenHashMap<IntArrayList> cardList = Utils.getCardList(datasetOrigin);
 
         //shuffle the positions of each element in cardinality list
@@ -162,7 +162,7 @@ public class RandomDatasets {
     /**
      * It generates a random dataset performing a series of 2m swaps of itemsets of the same size.
      * It returns the time required for the generation.
-     * 
+     *
      * @param numSwaps         <Integer> the number of swaps needed to be done
      * @param rand             <Random> the random generator used to choose the swaps
      * @param positions        <Int2ObjectOpenHashMap<Utils.Pair>> the hashmap that contains the positions of the dataset (See loadDataset method)
@@ -223,7 +223,7 @@ public class RandomDatasets {
         // stopping the timer
         long end = System.nanoTime();
 
-        // retrurn the time required to do the process
+        // return the time required to do the process
         return end - start;
     }
 
@@ -241,7 +241,7 @@ public class RandomDatasets {
     public static long sameFreqSwaps(Utils.Dataset datasetRandom,
                                      Int2ObjectOpenHashMap<Utils.Pair> positions,
                                      int numSwaps,
-                                     Random rand) 
+                                     Random rand)
     {
         // start the timer
         long start = System.nanoTime();
@@ -316,7 +316,7 @@ public class RandomDatasets {
      */
     public static long sameSizeSeqSwaps(int numSwaps,
                                         Random rand,
-                                        Utils.Dataset datasetRandom) 
+                                        Utils.Dataset datasetRandom)
     {
         // start the timer
         long start = System.nanoTime();
@@ -335,10 +335,14 @@ public class RandomDatasets {
                     probs[j] = 0;
                 }
             }
+
+            // standardizing the probabilities to be in the range of 0 to 1
             double sum = DoubleStream.of(probs).sum();
             for (int j = 1; j < probs.length; j++) {
                 probs[j] /= sum;
             }
+
+            // get two random sequences a and b
             int k = Utils.randomWeightedChoice(probs);
             int a = rand.nextInt(cardList.get(k).size());
             int b = rand.nextInt(cardList.get(k).size());
@@ -346,23 +350,23 @@ public class RandomDatasets {
             Utils.Sequence sA = cardList.get(k).get(a);
             Utils.Sequence sB = cardList.get(k).get(b);
 
+            // remove the corresponding sequences from cardinality list
             Utils.removeCardLists(sA, sB, cardList, datasetRandom);
 
+            // swap the corresponding sequences at hand
             Utils.swapSeq(sA, sB, datasetRandom);
 
+            // update the cardinality lists with the swapped sequences
             Utils.updateCardLists(sA, sB, cardList, datasetRandom);
         }
-        
-        //shuffle each transaction in datasetRandom
+        // shuffle each transaction in datasetRandom
         for (ObjectArrayList<Utils.Itemset> trans : datasetRandom) {
             Collections.shuffle(trans);
         }
 
         // stopping the timer
         long end = System.nanoTime();
-
-        // retrurn the time required to do the process
+        // return the time required to do the process
         return end - start;
     }
 }
-
